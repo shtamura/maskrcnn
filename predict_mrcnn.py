@@ -1,5 +1,7 @@
 import argparse
+import glob
 import logging
+import os
 import re
 import tensorflow as tf
 from keras import backend as K
@@ -10,9 +12,8 @@ from xrcnn.mrcnn import MaskRCNN
 from xrcnn.util.anchor import Anchor
 from xrcnn.util import bbox
 from xrcnn.util import image
-# from xrcnn.util import log
-
 import cv2
+import matplotlib.pyplot as plt
 
 FORMAT = '%(asctime)-15s %(levelname)s #[%(thread)d] %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -84,7 +85,7 @@ logger.warn("指定されたラベル数: %s. 学習時のラベル数と異な�
 # log.out_name_pattern = ".+debug$"
 
 argparser = argparse.ArgumentParser(description="FasterRCNNで物体検出")
-argparser.add_argument('--image_path', type=str,
+argparser.add_argument('--input_path', type=str,
                        required=True, help="処理対象の画像ファイルパス")
 argparser.add_argument('--weights_path', type=str,
                        required=True, help="モデルの重みファイルのパス")
@@ -95,9 +96,10 @@ args = argparser.parse_args()
 mrcnn = MaskRCNN(anchor.anchors, config)
 
 
-def pred(image_path):
+def pred(input_path):
+    logger.info("input_path: %s", input_path)
     # 画像をnumpy配列として読み込む
-    img = image.load_image_as_ndarray(image_path)
+    img = image.load_image_as_ndarray(input_path)
     img = img.astype(np.uint8)
     logger.debug("img.shape: %s", img.shape)
     # 学習時と同様にリサイズ
@@ -113,6 +115,7 @@ def pred(image_path):
     # logger.info("scale: %s", scale)
 
     # 表示用画像はopencvに合わせてRGBからBGRへ変換
+    img_org = img.copy()
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     bboxes, labels, scores, masks, rois, rpn_offsets, rpn_objects = \
@@ -129,7 +132,7 @@ def pred(image_path):
         np.squeeze(rpn_offsets, axis=0), \
         np.squeeze(rpn_objects, axis=0)
 
-    save_path_suffix = re.split('/|\.', image_path)
+    save_path_suffix = re.split('/|\.', input_path)
     save_path_suffix = save_path_suffix[-2] + '.png'
     if args.rpn:
         # 前景のみ
@@ -157,7 +160,7 @@ def pred(image_path):
             box = box.astype('int32')
             add_rect(img, box, (0, 0, 255), 1)
 
-        save_path = './pred_rpn_' + save_path_suffix
+        save_path = './out/pred_rpn_' + save_path_suffix
     else:
         # # ラベルに対応するマクスを残す
         # masks = masks[np.arange(masks.shape[0]), ]
@@ -197,9 +200,23 @@ def pred(image_path):
             add_rect(img, box, (b, g, 0), 2)
             add_mask(img, mask, box, (b, g, 0), config.image_shape[:2])
 
-        save_path = './pred_' + save_path_suffix
+        save_path = './out/pred_' + save_path_suffix
 
-    cv2.imwrite(save_path, img)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    def show_image(_img, _label, _num):
+        plt.subplot(1, 2, _num)
+        plt.imshow(_img)
+        # plt.axis('off')
+        plt.gca().get_xaxis().set_ticks_position('none')
+        plt.gca().get_yaxis().set_ticks_position('none')
+        plt.tick_params(labelbottom='off')
+        plt.tick_params(labelleft='off')
+        plt.xlabel(_label)
+
+    show_image(img_org, 'Input', 1)
+    show_image(img, 'Output', 2)
+    plt.savefig(save_path)
 
 
 with tf.device('/cpu:0'):
@@ -210,6 +227,9 @@ with tf.device('/cpu:0'):
     model.load_weights(args.weights_path, by_name=True)
     logger.debug("load_weights.")
 
-    paths = args.image_path.split(',')
+    if os.path.isdir(args.input_path):
+        paths = glob.glob(os.path.join(args.input_path, '*.jpg'))
+    else:
+        paths = args.input_path.split(',')
     for path in paths:
         pred(path)
