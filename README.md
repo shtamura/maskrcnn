@@ -82,7 +82,7 @@ python3 predict_mrcnn.py --weights_path ./model/maskrcnn.h5 --input_path /path/t
 ![](resource/result_12.png)
 ![](resource/result_13.png)
 
-#　課題
+# 課題
 - マスクの精度が低い。
   - 更なる学習が必要。
 - 画像の周辺部の検出精度が低い？
