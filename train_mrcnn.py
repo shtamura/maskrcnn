@@ -43,6 +43,9 @@ anchor = Anchor(config)
 argparser = argparse.ArgumentParser(description="FasterRCNNのトレーニング")
 argparser.add_argument('--data_path', type=str,
                        required=True, help="COCOデータセットが配置してあるディレクトリ")
+argparser.add_argument('--stage', type=int,
+                       required=True,
+                       help="トレーニングステージ.1:RPNのみ, 2:HEADのみ only, 3:両方")
 argparser.add_argument('--max_sample', type=int,
                        required=False, help="利用するVOCデータの上限")
 argparser.add_argument('--weights_path', type=str,
@@ -73,8 +76,19 @@ config.training = True
 config.gpu_count = 1
 config.batch_size = 2
 config.learning_rate = 0.001
+if args.stage == 1:
+    config.training_mode = 'rpn_only'
+    steps_per_epoch = 200
+    epochs = 500
+elif args.stage == 2:
+    config.training_mode = 'head_only'
+    steps_per_epoch = 100
+    epochs = 500
+else:
+    config.training_mode = 'all'
+    steps_per_epoch = 100
+    epochs = 500
 log.out_name_pattern = ".+_loss$"
-# print(images[0])
 
 mrcnn = MaskRCNN(anchor.anchors, config)
 model = mrcnn.compiled_model()
@@ -109,7 +123,9 @@ callbacks = [keras.callbacks.TerminateOnNaN(),
                                                patience=10,
                                                min_lr=config.learning_rate
                                                / 30)]
-model.fit_generator(train_data_generator, steps_per_epoch=100, epochs=400,
+model.fit_generator(train_data_generator,
+                    steps_per_epoch=steps_per_epoch,
+                    epochs=epochs,
                     verbose=1,
                     workers=4,
                     max_queue_size=10,

@@ -10,7 +10,6 @@ import xrcnn.loss as loss
 from xrcnn.frcnn import Frcnn
 from xrcnn.frcnn import SubsamplingRoiLayer
 from xrcnn.util import bbox
-from xrcnn.util import log
 from xrcnn.roi_align_layer import RoiAlignLayer
 
 logger = getLogger(__name__)
