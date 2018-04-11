@@ -51,12 +51,12 @@ python3 train_mrcnn.py --data_path /path/to/dataset --stage 1
 - stage2  
 Headのみの学習。
 ```
-python3 train_mrcnn.py --data_path /path/to/dataset --stage 2
+python3 train_mrcnn.py --weights_path ./model/maskrcnn.h5 --data_path /path/to/dataset --stage 2
 ```
 - stage3  
 RPN+Headの学習。
 ```
-python3 train_mrcnn.py --data_path /path/to/dataset --stage 3
+python3 train_mrcnn.py --weights_path ./model/maskrcnn.h5 --data_path /path/to/dataset --stage 3
 ```
 
 train_mrcnn.pyで指定する各学習のイテレーションは少なめなので、実行環境や許容されるコストに合わせて調整してください。
