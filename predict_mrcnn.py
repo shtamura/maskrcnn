@@ -214,6 +214,7 @@ def pred(input_path):
         plt.tick_params(labelleft='off')
         plt.xlabel(_label)
 
+    plt.figure(figsize=(6, 3))
     show_image(img_org, 'Input', 1)
     show_image(img, 'Output', 2)
     plt.savefig(save_path)
