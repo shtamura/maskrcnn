@@ -31,8 +31,8 @@ unzip annotations_trainval2017.zip
 ```
 
 # 論文と異なる点、制約事項
-学習時間、コスト削減のため、以下のように制限している。
-(GPUインスタンス費用がつらいので。。。)
+学習時間、コスト削減のため、以下のような制限を設けた。　　
+(GPUインスタンス費用がきついため。。。)
 - バックボーンネットワークにはKerasの学習済みのVGGを利用。
   - 論文ではResNetかFPN。
 - 検出オブジェクトを 人(ラベル:person) に限定。
@@ -82,7 +82,7 @@ python3 predict_mrcnn.py --weights_path ./model/maskrcnn.h5 --input_path /path/t
 ![](resource/result_12.png)
 ![](resource/result_13.png)
 
-#　課題
+# 課題
 - マスクの精度が低い。
   - 更なる学習が必要。
 - 画像の周辺部の検出精度が低い？
