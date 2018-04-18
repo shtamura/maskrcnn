@@ -11,10 +11,37 @@ MaskRCNN論文より抜粋[^2]
 
 # 環境
 - Python 3
-- TensorFlow(TensorFlow-gpu)
-- Keras
+- TensorFlow 1.4 (TensorFlow-gpu)
+- Keras 2.1
 - OpenCV
 - COCO API
+
+## GCPのDatalabインスタンスの場合
+当方ではGCPのDatalabインスタンスを利用し検証しました。
+その際のパッケージインストールコマンドは以下の通りです。
+参考まで。
+```
+apt-get update 
+apt-get install -y --allow-unauthenticated graphviz 
+apt-get install -y --allow-unauthenticated python-opencv 
+apt-get install -y --allow-unauthenticated vim 
+apt-get install -y --allow-unauthenticated python3 
+apt-get install -y --allow-unauthenticated python3-pip 
+apt-get install -y --allow-unauthenticated python3-tk 
+pip3 install --upgrade pip 
+pip3 install cython 
+pip3 install numpy 
+pip3 install tensorflow-gpu 
+pip3 install scikit-image 
+pip3 install scikit-learn 
+pip3 install keras 
+pip3 install h5py 
+pip3 install pydot 
+pip3 install pydot3 
+pip3 install pydot-ng 
+pip3 install graphviz 
+pip3 install opencv-python 
+```
 
 # 学習に利用したデータセット
 COCO  
